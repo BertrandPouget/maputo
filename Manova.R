@@ -1,8 +1,7 @@
 library(sf)
 library(tidyverse)
 
-setwd("C:/Users/markh/Documents/RHome/AppliedStat/Project")
-load("C:/Users/markh/Documents/RHome/AppliedStat/Lab 5 - Box-Cox + Multivariate CR/mcshapiro.test.RData")
+#load("C:/Users/markh/Documents/RHome/AppliedStat/Lab 5 - Box-Cox + Multivariate CR/mcshapiro.test.RData")
 
 #_______________________________________________________________________________
 ##### One-way MANOVA

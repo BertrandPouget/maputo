@@ -2,8 +2,6 @@ library(sf)
 library(tidyverse)
 library(rgl)
 
-setwd("C:/Users/markh/Documents/RHome/AppliedStat/Project")
-
 #Creazione dataset senza geometry
 dat <- st_read("datonite.shp")
 dat <- st_drop_geometry(dat)

@@ -1,10 +1,10 @@
 library(sf)
 library(raster)
-setwd("C:/Users/giuli/OneDrive/Desktop/R/Progetto Applied")
+#setwd("C:/Users/giuli/OneDrive/Desktop/R/Progetto Applied")
 datini=st_read("datini.shp")
 rmean=rvar=rmed=rmin=rmax=gmean=gvar=gmed=gmin=gmax=bmean=bvar=bmed=bmin=bmax=rep(0,dim(datini)[1])
 datonite=cbind(datini,rmean,rvar,rmed,rmin,rmax,gmean,gvar,gmed,gmin,gmax,bmean,bvar,bmed,bmin,bmax)
-setwd("C:/Users/giuli/OneDrive/Desktop/R/Progetto Applied/rater_mask_complete")
+#setwd("C:/Users/giuli/OneDrive/Desktop/R/Progetto Applied/rater_mask_complete")
 for(i in 1:dim(datini)[1])
 {
   img = brick(datonite$image[i])
