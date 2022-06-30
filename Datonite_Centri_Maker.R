@@ -26,7 +26,7 @@ data = st_drop_geometry(data)
 data = cbind.data.frame(data,mean_x,mean_y)
 data=data[-c(4287, 1218, 4368, 3337, 3325, 3990),]
 detach(data)
-View(data)
+#View(data)
 rm(mean_x,mean_y)
 
 ## Plottiamo i centri strade

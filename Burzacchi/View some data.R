@@ -1,5 +1,6 @@
 
-setwd("C:/Users/markh/Documents/RHome/AppliedStat/Project")
+#Ricorda di settare la tua working directory da Session!
+
 rm(list=ls())
 
 library(sf)
@@ -69,10 +70,10 @@ head(data[which(data$osm_surf=="unpaved"),])
 
 
 # paved and unpaved
-setwd("C:/Users/andre/Desktop/Progetto Applied Stat/rater_mask_complete")
+
 img_paved = brick("img__7.tif")
 img_unpaved = brick("img__129.tif")
-setwd("C:/Users/andre/Desktop/Progetto Applied Stat")
+
 
 
 # full pictures:
