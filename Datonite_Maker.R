@@ -1,10 +1,17 @@
+
+#Ricorda di settare la tua working directory da Session!
+
 library(sf)
 library(raster)
-#setwd("C:/Users/giuli/OneDrive/Desktop/R/Progetto Applied")
 datini=st_read("datini.shp")
+
+#Creiamo e aggiungiamo le colonne relative ai dati di interesse
+
 rmean=rvar=rmed=rmin=rmax=gmean=gvar=gmed=gmin=gmax=bmean=bvar=bmed=bmin=bmax=rep(0,dim(datini)[1])
 datonite=cbind(datini,rmean,rvar,rmed,rmin,rmax,gmean,gvar,gmed,gmin,gmax,bmean,bvar,bmed,bmin,bmax)
-#setwd("C:/Users/giuli/OneDrive/Desktop/R/Progetto Applied/rater_mask_complete")
+
+#Abitiamo le colonne e creiamo il nuvo dataset
+
 for(i in 1:dim(datini)[1])
 {
   img = brick(datonite$image[i])
@@ -28,5 +35,5 @@ for(i in 1:dim(datini)[1])
   datonite$bmin[i]=min(colori$b)
   datonite$bmax[i]=max(colori$b)
 }
-setwd("C:/Users/giuli/OneDrive/Desktop/R/Progetto Applied")
+
 st_write(datonite,"datonite.shp")

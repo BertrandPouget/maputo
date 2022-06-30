@@ -5,33 +5,27 @@ rm(list=ls())
 library(sf)
 library(sp)
 library(ggplot2)
-
-# Shapefile con i segmenti di strada
-data = st_read("datonite.shp")
-data = data[order(as.numeric(data$id)),]
-
-# Images  -----------------------------------------------------------------
-
 library(rgdal)
 library(sp)
 library(raster)
+data = st_read("datonite.shp")
+data = data[order(as.numeric(data$id)),]
 
 head(data[which(data$osm_surf=="paved"),])
 head(data[which(data$osm_surf=="unpaved"),])
 
-# paved and unpaved
-img_paved = brick("img__1573.tif")
+#Importiamo un esempio di immagine e plottiamola
 
-# full pictures:
+img_paved = brick("img__1573.tif")
 plotRGB(img_paved);
 
-# layer by layer:
+#Visualizziamo i vari colori separatamente
+
 names(img_paved) = c("redBand","greenBand", "blueBand", "null")
 plot(img_paved, col=gray(1:100/100)) 
 
-#View(values(img_paved))
+#Plottiamo gli istogrammi (di tutta l'immagine)
 
-# histogram of pixel components: red, green, blue
 {
   par(mfrow=c(1,3))
   hist(img_paved$redBand, xlab="", main='red values', col='red')
@@ -40,8 +34,9 @@ plot(img_paved, col=gray(1:100/100))
   par(mfrow=c(1,1))
 }
 
-val_paved = data.frame(values(img_paved)[which(apply(values(img_paved),1,sum)!=0),])
+#Rimuoviamo i pixel neri e riplottiamo gli istogrammi
 
+val_paved = data.frame(values(img_paved)[which(apply(values(img_paved),1,sum)!=0),])
 {
   par(mfrow=c(1,3))
   hist(val_paved$redBand, xlab="", main='red values', col='red')
@@ -52,21 +47,24 @@ val_paved = data.frame(values(img_paved)[which(apply(values(img_paved),1,sum)!=0
 
 graphics.off()
 
+#Plottiamo i valori dei tre colori
+
 attach(val_paved)
 plot3d(redBand, greenBand, blueBand)
 detach(val_paved)
 
-
-#Clustering
+#Facciamo clustering sui pixels
 
 val_tot = data.frame(values(img_paved))
 attach(val_tot)
 
-#Definizione distanza
-dat.e <- dist(val_tot[,1:3], method = "euclidean")
+#Definiamo distanza e clusters
 
-#Definizione clusters
+dat.e <- dist(val_tot[,1:3], method = "euclidean")
 dat.ec <- hclust(dat.e, method = "complete")
+
+#Plottiamo il dendrogramma con la suddivisione tramite rettangoli,
+#calcoliamo i clusters e plottiamo
 
 plot(dat.ec, main='euclidean-complete', hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
 rect.hclust(dat.ec, k=2)
@@ -76,8 +74,7 @@ cluster.ec
 
 plot3d(val_tot[,1:3], col=cluster.ec+1, pch=19)
 
-
-#COLORA STRADE
+#Coloriamo i pixel delle strade a seconda del cluster d'appartenenza
 
 for(i in 1:dim(values(img_paved))[1])
   if(sum(values(img_paved)[i,])!=0)
