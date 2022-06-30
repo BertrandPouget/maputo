@@ -1,3 +1,6 @@
+
+#Ricorda di settare la tua working directory da Session!
+
 library(sf)
 library(tidyverse)
 library(rgl)
