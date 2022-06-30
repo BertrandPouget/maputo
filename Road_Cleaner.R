@@ -2,7 +2,6 @@
 #Ricorda di settare la tua working directory da Session!
 
 rm(list=ls())
-
 library(sf)
 library(sp)
 library(ggplot2)
