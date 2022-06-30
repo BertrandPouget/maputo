@@ -1,7 +1,7 @@
 library(sf)
 library(tidyverse)
 
-#load("C:/Users/markh/Documents/RHome/AppliedStat/Lab 5 - Box-Cox + Multivariate CR/mcshapiro.test.RData")
+
 
 #_______________________________________________________________________________
 ##### One-way MANOVA
