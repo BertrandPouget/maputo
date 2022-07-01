@@ -69,7 +69,7 @@ dat.ec <- hclust(dat.e, method = "complete")
 plot(dat.ec, main='euclidean-complete', hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
 rect.hclust(dat.ec, k=2)
 
-cluster.ec <- cutree(dat.ec, k=2)
+cluster.ec <- cutree(dat.ec, k=3)
 cluster.ec
 
 plot3d(val_tot[,1:3], col=cluster.ec+1, pch=19)
@@ -85,7 +85,7 @@ for(i in 1:dim(values(img_paved))[1])
       values(img_paved)[i,2]=0
       values(img_paved)[i,3]=0
     }
-    else if(cluster.ec[i]==2)
+    else if(cluster.ec[i]!=2)
     {
       values(img_paved)[i,1]=0
       values(img_paved)[i,2]=0
