@@ -14,8 +14,9 @@ data = st_read("datonite.shp")
 data = data[order(as.numeric(data$id)),]
 
 #Importiamo un esempio di immagine e plottiamola
+#(Vai nella directory di rater_mask_datonite!)
 
-img = brick("img__1573.tif") #Vai nella sua directory!
+img = brick("img__1573.tif")
 plotRGB(img)
 names(img) = c("redBand","greenBand", "blueBand", "null")
 
@@ -61,5 +62,4 @@ for(i in 1:dim(values(img))[1])
     }
   }
         
-x11()
 plotRGB(img)
