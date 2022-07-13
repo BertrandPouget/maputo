@@ -17,11 +17,11 @@ categories <- dat[,4]
 #Creiamo e plottiamo il dataset numerico, sia con tutte le
 #strade, sia unicamente con le pavimentate
 
-keeps <- c("rmed","gmed","bmed")
+keeps <- c("rmed","rvar","rmax")
 dat_num <- dat[keeps]
 attach(dat)
 open3d()
-plot3d(dat_num, col = ifelse(osm_surf=="paved","gold","blue"))
+plot3d(dat_num, col = ifelse(osm_surf=="paved","red","blue"))
 pairs(dat_num)
 detach(dat)
 
@@ -78,6 +78,7 @@ plot(scores[,1:2], col=colo, pch=20)
 
 #Procediamo con il clustering
 
+
 #Definiamo la distanza ed i clusters
 
 dat.e <- dist(scores[,1:2], method = "canberra")
@@ -98,5 +99,11 @@ plot(scores[,1:2], col=cluster.ec+1, pch=19)
 #table(label.true = categories, label.cluster = cluster.ec)
 
 
+
+#K-Means
+
+result.k <- kmeans(scale(dat_num), centers=2) # Centers: fixed number of clusters
+
+plot3d(scale(dat_num), col = result.k$cluster+1)
 
 
