@@ -18,7 +18,7 @@ categories <- dat[,4]
 
 #Creiamo e plottiamo il dataset numerico
 
-keeps <- c("rmed","rvar","rmax","gmed","gvar","gmax","bmed","bvar","bmax","osm_surf")
+keeps <- c("rmean","rmed","rvar","rmax","rmin","gmean","gmed","gvar","gmax","gmin","bmean","bmed","bvar","bmax","bmin","osm_surf")
 dat_num <- dat[keeps]
 attach(dat)
 plot(scale(dat_num[,1:2]), col = ifelse(osm_surf=="paved","red","blue"))
@@ -35,9 +35,9 @@ detach(dat)
 # 1) if L=i, X.i ~ N(mu.i, sigma.i^2), i=A,B
 # 2) c(A|B)=c(B|A) (equal misclassification costs)
 
-qda.iris <- qda(dat_num[,1:9], dat_num$osm_surf)
+qda.iris <- qda(dat_num[,1:15], dat_num$osm_surf)
 qda.iris
-Qda.iris <- predict(qda.iris, dat_num[,1:9])
+Qda.iris <- predict(qda.iris, dat_num[,1:15])
 
 # 1) APER (without priors)
 table(class.true=dat_num$osm_surf, class.assigned=Qda.iris$class)
@@ -47,7 +47,7 @@ APERq
 # Remark: correct only if we estimate the priors through the sample frequencies!
 
 # 2) AER L1OCV (without priors)
-QdaCV.iris <- qda(dat_num[,1:9], dat_num$osm_surf, CV=T)
+QdaCV.iris <- qda(dat_num[,1:15], dat_num$osm_surf, CV=T)
 table(class.true=dat_num$osm_surf, class.assignedCV=QdaCV.iris$class)
 errorsqCV <- (QdaCV.iris$class != dat_num$osm_surf)
 AERqCV   <- sum(errorsqCV)/length(dat_num$osm_surf)
