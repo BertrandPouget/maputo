@@ -63,3 +63,22 @@ for(i in 1:dim(values(img))[1])
   }
         
 plotRGB(img)
+
+colori = data.frame(values(img)[which(apply(values(img)[,1:3],1,sum)!=0),])
+data$rmean[which(data$image=="img__1573.tif")]=mean(colori$r)
+data$rvar[which(data$image=="img__1573.tif")]=var(colori$redBand)
+data$rmed[which(data$image=="img__1573.tif")]=median(colori$redBand)
+data$rmin[which(data$image=="img__1573.tif")]=min(colori$redBand)
+data$rmax[which(data$image=="img__1573.tif")]=max(colori$redBand)
+
+data$gmean[which(data$image=="img__1573.tif")]=mean(colori$greenBand)
+data$gvar[which(data$image=="img__1573.tif")]=var(colori$greenBand)
+data$gmed[which(data$image=="img__1573.tif")]=median(colori$greenBand)
+data$gmin[which(data$image=="img__1573.tif")]=min(colori$greenBand)
+data$gmax[which(data$image=="img__1573.tif")]=max(colori$greenBand)
+
+data$bmean[which(data$image=="img__1573.tif")]=mean(colori$blueBand)
+data$bvar[which(data$image=="img__1573.tif")]=var(colori$blueBand)
+data$bmed[which(data$image=="img__1573.tif")]=median(colori$blueBand)
+data$bmin[which(data$image=="img__1573.tif")]=min(colori$blueBand)
+data$bmax[which(data$image=="img__1573.tif")]=max(colori$blueBand)
