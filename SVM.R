@@ -24,15 +24,17 @@ attach(dat)
 plot(scale(dat_num[,1:2]), col = ifelse(osm_surf=="paved","red","blue"))
 detach(dat)
 
+ran=sample(2558,1500,replace = F)
 
 
-svmfit <- svm(factor(osm_surf)~., data=dat_num[c(1:500,1500:2558),] , kernel ='linear', cost =10, scale =T,type="C-classification")
+
+svmfit <- svm(factor(osm_surf)~., data=dat_num[ran,] , kernel ='radial', cost =10, scale =T,type="C-classification")
 summary(svmfit)
-svm.pred <- predict(svmfit, dat_num[-c(1:500,1500:2558),])
+svm.pred <- predict(svmfit, dat_num[-ran,])
 
 plot(svmfit, dat_num, col =c('salmon', 'light blue'), pch=19)
 
-tab <- table(pred = svm.pred, true = osm_surf[-c(1:500,1500:2558)])
-classification_error <- 1- sum(svm.pred == osm_surf[-c(1:500,1500:2558)])/length(svm.pred)
+tab <- table(pred = svm.pred, true = dat$osm_surf[-ran])
+classification_error <- 1- sum(svm.pred == dat$osm_surf[-ran])/length(svm.pred)
 tab
 
