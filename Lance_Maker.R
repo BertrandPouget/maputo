@@ -24,45 +24,35 @@ lance=cbind(datini,rmean,rvar,rmed,rmin,rmax,gmean,gvar,gmed,gmin,gmax,bmean,bva
 for(i in 1:dim(datini)[1])
 {
   img = brick(lance$image[i])
-
-  # ROAD CLEANING
-  # Dividiamo il dataset in due parti per motivi computazionali
+  
   dat = data.frame(values(img))
-  attach(dat)
-  len=dim(dat)[1]/2
-  dat1 = dat[1:len,]
-  dat2 = dat[-c(1:len),]
-  detach(dat)
+  dat_col=dat[which(values(img)[,4]!=0),]
   
-  # Definiamo distanza e clusters
-  dat.e <- dist(dat1[,1:3], method = "euclidean")
+  dat.e <- dist(dat_col[,1:3], method = "euclidean")
   dat.ec <- hclust(dat.e, method = "complete")
-  cluster.ec1 <- cutree(dat.ec, k=3)
+  cluster.ec <- cutree(dat.ec, k=4)
+  dat_col=cbind.data.frame(dat_col,cluster.ec)
   
-  dat.e <- dist(dat2[,1:3], method = "euclidean")
-  dat.ec <- hclust(dat.e, method = "complete")
-  cluster.ec2 <- cutree(dat.ec, k=3)
   
-  cluster.ec <- c(cluster.ec1,cluster.ec2)
+  clus=rep(0,dim(dat)[1])
+  j=0
+  for(ii in row.names(dat_col))
+  {
+    j=j+1
+    clus[as.numeric(ii)]=dat_col$cluster.ec[j]
+  }
   
-  for(j in 1:dim(values(img))[1])
-    if(sum(values(img)[j,])!=0)
-    {
-      if(cluster.ec[j]==1)
-      {
-        values(img)[j,1]=0
-        values(img)[j,2]=0
-        values(img)[j,3]=0
-        values(img)[j,4]=0
-      }
-      else
-      {
-        values(img)[j,1]=values(img)[j,1]
-        values(img)[j,2]=values(img)[j,2]
-        values(img)[j,3]=values(img)[j,3]
-        values(img)[j,4]=values(img)[j,4]
-      }
-    }
+  dat=cbind.data.frame(dat,clus)
+  
+  k=dat_col[which(dat_col[,1]==min(dat_col[,1])),5]
+  
+  checki=intersect(unique(which(dat$clus==k)), which(values(img)[,4]==255))
+  
+  
+  for(iii in checki) #se è del cluster 1, va eliminato
+  {
+    values(img)[iii,]=c(0,0,0,0)
+  }
   
   # CALCOLO VARIABILI
   names(img) = c("r","g", "b", "null")
