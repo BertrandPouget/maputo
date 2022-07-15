@@ -53,19 +53,21 @@ for(i in 1:dim(values(img))[1])
       values(img)[i,1]=0
       values(img)[i,2]=0
       values(img)[i,3]=0
+      values(img)[i,4]=0
     }
     else
     {
       values(img)[i,1]=values(img)[i,1]
       values(img)[i,2]=values(img)[i,2]
       values(img)[i,3]=values(img)[i,3]
+      values(img)[i,4]=values(img)[i,4]
     }
   }
         
 plotRGB(img)
 
-colori = data.frame(values(img)[which(apply(values(img)[,1:3],1,sum)!=0),])
-data$rmean[which(data$image=="img__1573.tif")]=mean(colori$r)
+colori = data.frame(values(img)[which(apply(values(img),1,sum)!=0),])
+data$rmean[which(data$image=="img__1573.tif")]=mean(colori$redBand)
 data$rvar[which(data$image=="img__1573.tif")]=var(colori$redBand)
 data$rmed[which(data$image=="img__1573.tif")]=median(colori$redBand)
 data$rmin[which(data$image=="img__1573.tif")]=min(colori$redBand)

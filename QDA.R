@@ -1,5 +1,7 @@
 
 #Ricorda di settare la tua working directory da Session!
+rm(list=ls())
+graphics.off()
 
 library(sf)
 library(tidyverse)
@@ -7,22 +9,54 @@ library(e1071)
 library(rgl)
 library(misc3d)
 
-#Creiamo il dataset senza geometry
-
+# Importazione dataset
 dat <- st_read("datonite.shp")
 dat <- st_drop_geometry(dat)
 dat <- dat[which(dat$osm_surf != "unk"),]
 dat <- dat[order(dat$osm_surf),]
 rownames(dat) <- 1:nrow(dat)
 categories <- dat[,4]
+dat_num <- dat[,-(1:6)]
 
-#Creiamo e plottiamo il dataset numerico
+# PCA
+boxplot(dat_num)
+ds <- data.frame(scale(dat_num))
+boxplot(ds)
 
-keeps <- c("rmean","rmed","rvar","rmax","rmin","gmean","gmed","gvar","gmax","gmin","bmean","bmed","bvar","bmax","bmin","osm_surf")
-dat_num <- dat[keeps]
-attach(dat)
-plot(scale(dat_num[,1:2]), col = ifelse(osm_surf=="paved","red","blue"))
-detach(dat)
+pc <- princomp(ds, scores = TRUE)
+summary(pc)
+load <- pc$loadings
+
+#Osserviamo graficamente la percentuale di varianza spiegata
+#dalle varie componenti
+layout(matrix(c(2,3,1,3),2,byrow=T))
+plot(pc, las=2, main='Principal components')
+barplot(sapply(ds,sd)^2, las=2, main='Original Variables', ylab='Variances', ylim=c(0,1))
+plot(cumsum(pc$sd^2)/sum(pc$sd^2), type='b', axes=F, xlab='number of components', 
+     ylab='contribution to the total variance', ylim=c(0,1))
+abline(h=1, col='blue')
+abline(h=0.8, lty=2, col='blue')
+box()
+axis(2,at=0:10/10,labels=0:10/10)
+axis(1,at=1:ncol(ds),labels=1:ncol(ds),las=2)
+
+#Varianza spiegata
+# To obtain the rows of the summary:
+# standard deviation of the components
+pc$sd
+# proportion of variance explained by each PC
+pc$sd^2/sum(pc$sd^2)
+# cumulative proportion of explained variance
+cumsum(pc$sd^2)/sum(pc$sd^2)
+
+#Rappresentiamo i loadings delle componenti principali, per 
+#poterli interpretare
+#x11()
+par(mfrow = c(5,1))
+for(i in 1:5) barplot(load[,i], ylim = c(-1, 1))
+
+dat_pc <- data.frame(pc$scores[,1:5])
+#plot3d(dat_pc[,1:3], col = ifelse(categories=='paved','gold','blue'))
 
 #######################################################################################
 ###PER ORA O FAI CON 2 E RIESCI A PLOTTARE, O FAI CON TUTTE E OTTIENI UN OTTIMO APER###
@@ -35,41 +69,22 @@ detach(dat)
 # 1) if L=i, X.i ~ N(mu.i, sigma.i^2), i=A,B
 # 2) c(A|B)=c(B|A) (equal misclassification costs)
 
-qda.iris <- qda(dat_num[,1:15], dat_num$osm_surf)
+qda.iris <- qda(dat_pc, categories)
 qda.iris
-Qda.iris <- predict(qda.iris, dat_num[,1:15])
+Qda.iris <- predict(qda.iris, dat_pc)
 
 # 1) APER (without priors)
-table(class.true=dat_num$osm_surf, class.assigned=Qda.iris$class)
-errorsq <- (Qda.iris$class != dat_num$osm_surf)
-APERq   <- sum(errorsq)/length(dat_num$osm_surf)
+table(class.true=categories, class.assigned=Qda.iris$class)
+errorsq <- (Qda.iris$class != categories)
+APERq   <- sum(errorsq)/length(categories)
 APERq
+
 # Remark: correct only if we estimate the priors through the sample frequencies!
 
 # 2) AER L1OCV (without priors)
-QdaCV.iris <- qda(dat_num[,1:15], dat_num$osm_surf, CV=T)
-table(class.true=dat_num$osm_surf, class.assignedCV=QdaCV.iris$class)
-errorsqCV <- (QdaCV.iris$class != dat_num$osm_surf)
-AERqCV   <- sum(errorsqCV)/length(dat_num$osm_surf)
+QdaCV.iris <- qda(dat_pc, categories, CV=T)
+table(class.true=categories, class.assignedCV=QdaCV.iris$class)
+errorsqCV <- (QdaCV.iris$class != categories)
+AERqCV   <- sum(errorsqCV)/length(categories)
+AERqCV
 
-# Plot partition
-x11()
-plot(dat_num[,1:2], main='Plot', pch=20)
-points(dat_num[which(dat_num$osm_surf=="paved"),1:2], col='red', pch=20)
-points(dat_num[which(dat_num$osm_surf=="unpaved"),1:2], col='green', pch=20)
-legend("topright", legend=levels(dat_num$osm_surf), fill=c('red','green'), cex=.7)
-
-points(qda.iris$means, pch=4,col=c('red','green') , lwd=2, cex=1.5)
-x  <- seq(min(dat_num[,1]), max(dat_num[,1]), length=200)
-y  <- seq(min(dat_num[,2]), max(dat_num[,2]), length=200)
-xy <- expand.grid(Sepal.Length=x, Sepal.Width=y) #### CHANGE THIS ONE
-
-z  <- predict(qda.iris, xy)$post  # these are P_i*f_i(x,y)  
-z1 <- z[,1] - pmax(z[,2])  # P_1*f_1(x,y)-max{P_j*f_j(x,y)}  
-z2 <- z[,2] - pmax(z[,1])  # P_2*f_2(x,y)-max{P_j*f_j(x,y)}    
-
-# Plot the contour line of level (levels=0) of z1, z2, z3: 
-# P_i*f_i(x,y)-max{P_j*f_j(x,y)}=0 i.e., boundary between R.i and R.j 
-# where j realizes the max.
-contour(x, y, matrix(z1, 200), levels=0, drawlabels=F, add=T)  
-contour(x, y, matrix(z2, 200), levels=0, drawlabels=F, add=T)

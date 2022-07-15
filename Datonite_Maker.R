@@ -10,7 +10,7 @@ datini=st_read("datini.shp")
 rmean=rvar=rmed=rmin=rmax=gmean=gvar=gmed=gmin=gmax=bmean=bvar=bmed=bmin=bmax=rep(0,dim(datini)[1])
 datonite=cbind(datini,rmean,rvar,rmed,rmin,rmax,gmean,gvar,gmed,gmin,gmax,bmean,bvar,bmed,bmin,bmax)
 
-#Abitiamo le colonne e creiamo il nuvo dataset
+#Abitiamo le colonne e creiamo il nuovo dataset
 
 for(i in 1:dim(datini)[1])
 {
