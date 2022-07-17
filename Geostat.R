@@ -16,7 +16,8 @@ library(sf)
 #setwd("C:/Users/giuli/OneDrive/Desktop/Maputo")
 setwd("C:/Users/markh/Desktop/Università/Maputo")
 
-d=st_read("lance.shp")
+set.seed(10094)
+d = st_read("lance.shp")
 
 #Creiamo e abitiamo i vettori delle medie
 mean_x = rep(0,5116)
@@ -24,7 +25,7 @@ mean_y = rep(0,5116)
 dist = rep(0,5116)
 attach(d)
 
-cityhall=c(3626100,-2995123)
+cityhall = c(3626100,-2995123)
 
 for(i in 1:5116)
 {
@@ -40,43 +41,52 @@ rm(g,mat,i)
 #e togliamo i dati "sporchi"
 d = st_drop_geometry(d)
 d = cbind.data.frame(d,mean_x,mean_y,dist)
-d = d[-c(4287, 1218, 4368, 3337, 3325, 3990),c(2:4,22:24)]
+d = d[-c(4287, 1218, 4368, 3337, 3325, 3990),c(2:4,7:8,22:24)]
 rm(mean_x,mean_y,dist)
 dk = d[which(osm_surf!='unk'),]
+sam = sample(2558,2300)
+train = dk[sam,]
+test = dk[-sam,]
+rownames(train) = 1:2300
+rownames(test) = 1:258
 detach(d)
-pav = ifelse(dk$osm_surf == 'paved', 1, 0)
-dk$osm_surf = pav
-
-#############################################################
-##############                                 ##############
-######   EXPLORATORY ANALYSIS & VARIOGRAM ESTIMATION  #######
-##############                                 ##############
-#############################################################
+pav = ifelse(train$osm_surf == 'paved', 1, 0)
+train$osm_surf = pav
+pav = ifelse(test$osm_surf == 'paved', 1, 0)
+test$osm_surf = pav
+rm(pav)
 
 ## Define the sample coordinates
-coordinates(d) <- c('mean_x','mean_y')
-coordinates(dk) <- c('mean_x','mean_y')
+coordinates(train) <- c('mean_x','mean_y')
 
-## Estimating Spatial Correlation ##
-##     Variogram Analysis         ##
-##--------------------------------##
-# CLASS
-v <- variogram(osm_surf ~ dist, dk)
+# Variogram
+v <- variogram(osm_surf ~ dist + osm_typo + rmean + rvar, train)
 
 plot(v,pch=19)
 
 # try reasonable initial values
-v.fit <- fit.variogram(v, vgm(0.2, "Sph", 6000, 0.05))
+v.fit <- fit.variogram(v, vgm(0.1, "Sph", 5000, 0))
 plot(v, v.fit, pch = 19)
 
-# MODEL
-g.no <- gstat(formula = osm_surf ~ dist, data = dk, model = v.fit)
+# Model
+g.no <- gstat(formula = osm_surf ~ dist + osm_typo + rmean +
+                rvar, data = train, model = v.fit)
 
-# PREDICTION
-x1 = data.frame(
-  mean_x=3629324,
-  mean_y=-2992720,
-  dist=4020.822)
-coordinates(x1) <- c("mean_x","mean_y")
-pr <- predict(g.no, x1)$var1.pred
-pr
+# Prediction
+x = NULL
+for(i in 1:258)
+{
+  x1 = data.frame(
+  osm_typo = test[i,2],
+  mean_x = test[i,6],
+  mean_y = test[i,7],
+  dist = test[i,8],
+  rmean = test[i,4],
+  rvar = test[i,5])
+  coordinates(x1) <- c("mean_x","mean_y")
+  pr <- predict(g.no, x1, BLUE = TRUE)$var1.pred
+  print(i)
+  x = c(x, ifelse(pr > 0.5, 1, 0))
+}
+t <- table(class.true=test$osm_surf, class.assigned=x)
+acc <- (t[1,1]+t[2,2])/258
