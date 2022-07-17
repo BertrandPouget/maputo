@@ -1,8 +1,12 @@
 
 #Ricorda di settare la tua working directory da Session!
+#setwd("C:/Users/markh/Desktop/Università/Maputo")
+
 rm(list=ls())
 graphics.off()
 
+library(MASS)
+library(class)
 library(sf)
 library(tidyverse)
 library(e1071)
@@ -10,7 +14,7 @@ library(rgl)
 library(misc3d)
 
 # Importazione dataset
-dat <- st_read("datonite.shp")
+dat <- st_read("lance.shp")
 dat <- st_drop_geometry(dat)
 dat <- dat[which(dat$osm_surf != "unk"),]
 dat <- dat[order(dat$osm_surf),]

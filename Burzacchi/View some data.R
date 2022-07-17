@@ -46,8 +46,8 @@ ttt[i_unk]= "1. unknown"; ttt[i_unp]="2. unpaved"; ttt[i_asp]="3. paved"
 
 windows();  ggplot() + 
   geom_sf(data = data, aes(color=ttt,fill=ttt))+
-  scale_fill_manual(values=c("snow2", "#ffb01e", "grey45"))+
-  scale_color_manual(values=c("snow2", "#ffb01e", "grey45"))+
+  scale_fill_manual(values=c("snow2", "forestgreen", "gold"))+
+  scale_color_manual(values=c("snow2", "forestgreen", "gold"))+
   labs(fill= "Pavement surface")+
   #ggtitle("Road network of the Greater Maputo area") + 
   coord_sf() +
@@ -70,14 +70,14 @@ head(data[which(data$osm_surf=="unpaved"),])
 
 
 # paved and unpaved
-
+setwd("C:/Users/markh/Desktop/Università/Maputo/rater_mask_datonite")
 img_paved = brick("img__7.tif")
 img_unpaved = brick("img__129.tif")
 
 
 
 # full pictures:
-par(mfrow=c(1,2)); plotRGB(img_paved); plotRGB(img_unpaved)
+par(mfrow=c(2,1)); plotRGB(img_paved); plotRGB(img_unpaved)
 
 
 # layer by layer:

@@ -10,7 +10,7 @@ library(rgl)
 library(misc3d)
 
 # Importazione dataset
-dat <- st_read("datonite.shp")
+dat <- st_read("lance.shp")
 dat <- st_drop_geometry(dat)
 dat <- dat[which(dat$osm_surf != "unk"),]
 dat <- dat[order(dat$osm_surf),]
@@ -58,7 +58,7 @@ for(i in 1:5) barplot(load[,i], ylim = c(-1, 1))
 dat_pc <- data.frame(pc$scores[,1:5])
 #plot3d(dat_pc[,1:3], col = ifelse(categories=='paved','gold','blue'))
 
-set.seed(19)
+set.seed(42)
 err = rep(1000, 21)
 
 library(class)
