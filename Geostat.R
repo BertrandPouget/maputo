@@ -23,7 +23,6 @@ d = st_read("lance.shp")
 mean_x = rep(0,5116)
 mean_y = rep(0,5116)
 dist = rep(0,5116)
-attach(d)
 
 cityhall = c(3626100,-2995123)
 
@@ -43,13 +42,12 @@ d = st_drop_geometry(d)
 d = cbind.data.frame(d,mean_x,mean_y,dist)
 d = d[-c(4287, 1218, 4368, 3337, 3325, 3990),c(2:4,7:8,22:24)]
 rm(mean_x,mean_y,dist)
-dk = d[which(osm_surf!='unk'),]
+dk = d[which(d$osm_surf!='unk'),]
 sam = sample(2558,2300)
 train = dk[sam,]
 test = dk[-sam,]
 rownames(train) = 1:2300
-rownames(test) = 1:258
-detach(d)
+rownames(test) = 1:257
 pav = ifelse(train$osm_surf == 'paved', 1, 0)
 train$osm_surf = pav
 pav = ifelse(test$osm_surf == 'paved', 1, 0)
@@ -61,7 +59,6 @@ coordinates(train) <- c('mean_x','mean_y')
 
 # Variogram
 v <- variogram(osm_surf ~ dist + osm_typo + rmean + rvar, train)
-
 plot(v,pch=19)
 
 # try reasonable initial values
@@ -74,7 +71,7 @@ g.no <- gstat(formula = osm_surf ~ dist + osm_typo + rmean +
 
 # Prediction
 x = NULL
-for(i in 1:258)
+for(i in 1:257)
 {
   x1 = data.frame(
   osm_typo = test[i,2],
@@ -89,4 +86,10 @@ for(i in 1:258)
   x = c(x, ifelse(pr > 0.5, 1, 0))
 }
 t <- table(class.true=test$osm_surf, class.assigned=x)
-acc <- (t[1,1]+t[2,2])/258
+rownames(t) = c("unpaved", "paved")
+colnames(t) = c("unpaved", "paved")
+t <- t[c(2,1),c(2,1)]
+t
+accuracy <- (t[1,1]+t[2,2])/257
+accuracy
+

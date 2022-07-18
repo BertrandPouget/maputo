@@ -16,8 +16,8 @@ library(misc3d)
 # Importazione dataset
 dat <- st_read("lance.shp")
 dat <- st_drop_geometry(dat)
+dat <- dat[-c(4287, 1218, 4368, 3337, 3325, 3990),]
 dat <- dat[which(dat$osm_surf != "unk"),]
-dat <- dat[order(dat$osm_surf),]
 rownames(dat) <- 1:nrow(dat)
 categories <- dat[,4]
 dat_num <- dat[,-(1:6)]
@@ -45,11 +45,6 @@ axis(2,at=0:10/10,labels=0:10/10)
 axis(1,at=1:ncol(ds),labels=1:ncol(ds),las=2)
 
 #Varianza spiegata
-# To obtain the rows of the summary:
-# standard deviation of the components
-pc$sd
-# proportion of variance explained by each PC
-pc$sd^2/sum(pc$sd^2)
 # cumulative proportion of explained variance
 cumsum(pc$sd^2)/sum(pc$sd^2)
 
@@ -69,7 +64,7 @@ test = dat_pc[-sam,]
 cat_train = categories[sam]
 cat_test = categories[-sam]
 rownames(train) = 1:2300
-rownames(test) = 1:258
+rownames(test) = 1:257
 
 # QDA
 qda.d <- qda(train, cat_train)
@@ -78,5 +73,5 @@ Qda.d <- predict(qda.d, test)
 
 t <- table(class.true=cat_test, class.assigned=Qda.d$class)
 t
-accuracy <- (t[1,1]+t[2,2])/258
+accuracy <- (t[1,1]+t[2,2])/257
 accuracy
