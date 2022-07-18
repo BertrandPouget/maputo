@@ -13,8 +13,8 @@ library(geoR)         ## Geostatistics
 library(gstat)        ## Geostatistics
 library(sf)
 
-#setwd("C:/Users/giuli/OneDrive/Desktop/Maputo")
-setwd("C:/Users/markh/Desktop/Università/Maputo")
+setwd("C:/Users/giuli/OneDrive/Desktop/Maputo")
+#setwd("C:/Users/markh/Desktop/Università/Maputo")
 
 set.seed(10094)
 d = st_read("lance.shp")
