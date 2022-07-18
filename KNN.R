@@ -1,4 +1,3 @@
-
 #Ricorda di settare la tua working directory da Session!
 rm(list=ls())
 graphics.off()
@@ -8,6 +7,7 @@ library(tidyverse)
 library(e1071)
 library(rgl)
 library(misc3d)
+library(class)
 
 # Importazione dataset
 dat <- st_read("lance.shp")
@@ -58,22 +58,27 @@ for(i in 1:5) barplot(load[,i], ylim = c(-1, 1))
 dat_pc <- data.frame(pc$scores[,1:5])
 #plot3d(dat_pc[,1:3], col = ifelse(categories=='paved','gold','blue'))
 
-set.seed(42)
+set.seed(10094)
 err = rep(1000, 21)
 
-library(class)
+sam = sample(2558,2300)
+train = dat_pc[sam,]
+test = dat_pc[-sam,]
+cat_train = categories[sam]
+cat_test = categories[-sam]
+rownames(train) = 1:2300
+rownames(test) = 1:258
 
 for (k in 1:30) {
-  d.knn <- knn.cv(train = dat_pc, cl = categories, k = k)
-  
-  errorCV <- (d.knn != categories)
-  err[k]   <- sum(errorCV)/length(categories)
+  d.knn <- knn.cv(train = train, cl = cat_train, k = k)
+  error <- (d.knn != cat_train)
+  err[k]   <- sum(error)/length(cat_train)
 }
-min(err)
-kbest=which.min(err)  
-kbest 
-best <- knn.cv(train = dat_pc, cl = categories, k = kbest)
-errorCV <- (best != categories)
-err_fin  <- sum(errorCV)/length(categories)
-err_fin
 
+kbest <- which.min(err)  
+kbest 
+assigned <- knn(train = train, test = test, cl = cat_train, k = kbest)
+t <- table(class.true = cat_test, class.assigned = assigned)
+t
+acc <- (t[1,1]+t[2,2])/258
+acc

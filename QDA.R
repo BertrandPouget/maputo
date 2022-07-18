@@ -1,9 +1,9 @@
-
 #Ricorda di settare la tua working directory da Session!
 #setwd("C:/Users/markh/Desktop/Università/Maputo")
 
 rm(list=ls())
 graphics.off()
+load("~/RHome/AppliedStat/Lab 5 - Box-Cox + Multivariate CR/mcshapiro.test.RData")
 
 library(MASS)
 library(class)
@@ -60,35 +60,23 @@ par(mfrow = c(5,1))
 for(i in 1:5) barplot(load[,i], ylim = c(-1, 1))
 
 dat_pc <- data.frame(pc$scores[,1:5])
-#plot3d(dat_pc[,1:3], col = ifelse(categories=='paved','gold','blue'))
+#plot3d(dat_pc[,1:3], col = ifelse(categories=='paved','gold','forestgreen'))
 
-#######################################################################################
-###PER ORA O FAI CON 2 E RIESCI A PLOTTARE, O FAI CON TUTTE E OTTIENI UN OTTIMO APER###
-#######################################################################################
+set.seed(10094)
+sam = sample(2558,2300)
+train = dat_pc[sam,]
+test = dat_pc[-sam,]
+cat_train = categories[sam]
+cat_test = categories[-sam]
+rownames(train) = 1:2300
+rownames(test) = 1:258
 
-############# QDA ###################
-###--------------------------
-#### Assumptions:
-###------------------
-# 1) if L=i, X.i ~ N(mu.i, sigma.i^2), i=A,B
-# 2) c(A|B)=c(B|A) (equal misclassification costs)
+# QDA
+qda.d <- qda(train, cat_train)
+qda.d
+Qda.d <- predict(qda.d, test)
 
-qda.iris <- qda(dat_pc, categories)
-qda.iris
-Qda.iris <- predict(qda.iris, dat_pc)
-
-# 1) APER (without priors)
-table(class.true=categories, class.assigned=Qda.iris$class)
-errorsq <- (Qda.iris$class != categories)
-APERq   <- sum(errorsq)/length(categories)
-APERq
-
-# Remark: correct only if we estimate the priors through the sample frequencies!
-
-# 2) AER L1OCV (without priors)
-QdaCV.iris <- qda(dat_pc, categories, CV=T)
-table(class.true=categories, class.assignedCV=QdaCV.iris$class)
-errorsqCV <- (QdaCV.iris$class != categories)
-AERqCV   <- sum(errorsqCV)/length(categories)
-AERqCV
-
+t <- table(class.true=cat_test, class.assigned=Qda.d$class)
+t
+accuracy <- (t[1,1]+t[2,2])/258
+accuracy
