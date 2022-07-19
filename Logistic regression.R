@@ -592,7 +592,6 @@ ggplot() +
   scale_fill_manual(values=c("forestgreen", "gold"))+
   scale_color_manual(values=c("forestgreen", "gold"))+
   labs(fill= "Pavement surface")+
-  ggtitle("Road network of the Greater Maputo area") + 
   coord_sf() +
   theme(panel.grid.major = element_line(color = gray(0.9), linetype=3, size=0.2), 
         panel.background = element_rect(fill="white"))+
