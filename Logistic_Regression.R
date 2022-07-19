@@ -547,7 +547,11 @@ predicted.values = ifelse(predicted.values>threshold,1,0)
 head(predicted.values)
 
 real.values = test$osm_surf
-tab = table(real.values,predicted.values)
+tab = table(class.true=real.values, class.assigned=predicted.values)
+tab
+rownames(tab) = c("unpaved", "paved")
+colnames(tab) = c("unpaved", "paved")
+tab <- tab[c(2,1),c(2,1)]
 tab
 
 Accuracy = (tab[1,1]+tab[2,2])/(tab[1,1]+tab[1,2]+tab[2,1]+tab[2,2])
