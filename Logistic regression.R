@@ -1,7 +1,7 @@
 #----------------------------LOGISTIC REGRESSION------------------------------
 ##-------------------------------First steps----------------------------------
 #Setting the working directory
-setwd("C:/Users/user/OneDrive/Documenti/Magistrale/Applied Statistics/Project")
+setwd("C:/Users/user/Desktop/Maputo")
 
 #Libraries
 library(sf) #to import files ".shp"
@@ -9,11 +9,11 @@ library(caTools) #to split the data set
 library(GGally) #for the scatterplot
 
 #Import the data set
-datonite = st_read("datonite.shp")
-View(datonite)
-summary(datonite)
+lance = st_read("lance.shp")
+View(lance)
+summary(lance)
 #We are gonna work on the first 2558 rows of the data set
-data = datonite[1:2558,]
+data = lance[1:2558,]
 
 #The target variable is "osm_surf" which is of type character and it can be
 #either "paved" or "unpaved". We set "paved" = 1 and "unpaved" = 0.
@@ -98,9 +98,9 @@ step(model, direction = "backward" , trace = T)
 #predictors, and stops when you have a model where all predictors are 
 #statistically significant.
 
-model = glm(osm_surf ~  rmean+rmin+rmax+
-                        gmean+gvar+gmed+gmax+
-                        bvar+bmed+bmin+bmax,
+model = glm(osm_surf ~  rmed+rmin+rmax+
+                        gmean+gvar+gmax+
+                        bmean+bvar+bmed+bmin+bmax,
                         data = training,family = binomial(link = logit))
 summary(model)
 
@@ -270,9 +270,9 @@ testing$osm_typo_unk = ifelse(testing$osm_typo == 'unk',1,0)
 View(testing)
 
 model2 = glm(osm_surf ~  
-                        rmean+rmin+rmax+
-                        gmean+gvar+gmed+gmax+
-                        bvar+bmed+bmin+
+                        rmed+rmin+rmax+
+                        gmean+gvar+gmax+
+                        bmean+bvar+bmed+bmin+bmax+
                         osm_typo_footway+osm_typo_primary+osm_typo_residentia+osm_typo_secondary+osm_typo_tertiary+osm_typo_unk,
                         data = training,family = binomial(link = logit))
 summary(model2)
@@ -284,10 +284,9 @@ summary(model2)
 step(model2, direction = "backward" , trace = T)
 
 model3 = glm(osm_surf ~  
-                        rmean+rmin+rmax+
-                        gmed+
-                        bvar+bmed+
-                        osm_typo_footway+osm_typo_residentia+osm_typo_tertiary+osm_typo_unk,
+                        rmed+rmax+
+                        bmean+bvar+bmin+bmax+
+                        osm_typo_footway+osm_typo_primary+osm_typo_residentia+osm_typo_secondary+osm_typo_tertiary,
                         data = training,family = binomial(link = logit))
 summary(model3)
 
@@ -366,15 +365,14 @@ ttt[i_unp]="1. unpaved"; ttt[i_asp]="2. paved"
 windows()  
 ggplot() + 
   geom_sf(data = total, aes(color=ttt,fill=ttt))+
-  scale_fill_manual(values=c("#ffb01e", "grey45"))+
-  scale_color_manual(values=c("#ffb01e", "grey45"))+
+  scale_fill_manual(values=c("forestgreen", "gold"))+
+  scale_color_manual(values=c("forestgreen", "gold"))+
   labs(fill= "Pavement surface")+
   ggtitle("Road network of the Greater Maputo area") + 
   coord_sf() +
   theme(panel.grid.major = element_line(color = gray(0.9), linetype=3, size=0.2), 
         panel.background = element_rect(fill="white"))+
   guides(color=FALSE)
-
 
 #-------Comparison between the misclassified streets in the two models---------
 id_misclassidied #ids of the streets misclassified by the model w7 'osm_typo'
@@ -450,3 +448,152 @@ tab_misclassified = factor(misclassified_streets$osm_typo,levels = c('footway', 
 tab_misclassified = table(tab_misclassified)
 tab_misclassified
 
+#--------------------------------Final product---------------------------------
+set.seed(10094)
+lance = lance[-c(4287,1218,4368,3337,3325,3990),]
+lance2 = lance[which(lance$osm_surf!='unk'),]
+sam = sample(2558,2300)
+train = lance2[sam,]
+test = lance2[-sam,]
+rownames(train) = 1:2300
+rownames(test) = 1:257
+
+train$osm_surf = ifelse(train$osm_surf == 'paved',1,0)
+train$osm_typo_footway = ifelse(train$osm_typo == 'footway',1,0)
+train$osm_typo_primary = ifelse(train$osm_typo == 'primary',1,0)
+train$osm_typo_residentia = ifelse(train$osm_typo == 'residentia',1,0)
+train$osm_typo_secondary = ifelse(train$osm_typo == 'secondary',1,0)
+train$osm_typo_tertiary = ifelse(train$osm_typo == 'tertiary',1,0)
+train$osm_typo_unk = ifelse(train$osm_typo == 'unk',1,0)
+
+model = glm(osm_surf ~  
+                      rmean+rvar+rmed+rmin+rmax+
+                      gmean+gvar+gmed+gmin+gmax+
+                      bmean+bvar+bmed+bmin+bmax+
+                      osm_typo_footway+osm_typo_primary+osm_typo_residentia+osm_typo_secondary+osm_typo_tertiary+osm_typo_unk,
+                      data = train,family = binomial(link = logit))
+summary(model)
+
+step(model, direction = "backward" , trace = T)
+
+final_model = glm(osm_surf ~  
+              rmed+rmin+rmax+
+              gvar+gmin+
+              bmean+bmax+
+              osm_typo_footway+osm_typo_primary+osm_typo_residentia+osm_typo_secondary+osm_typo_tertiary,
+              data = train,family = binomial(link = logit))
+summary(final_model)
+
+threshold = c(0.2,0.25,0.3,0.35,0.4,0.45,0.5)
+accuracy = c()
+sensitivity = c()
+specificity = c()
+RMSE = c()
+Acc = c()
+Sens = c()
+Spec = c()
+rmse = c()
+
+for (i in 1:length(threshold)) {
+  for (k in 1:10) {
+    validation = train[((k-1)*round(0.1*dim(train)[1])+1):(k*round(0.1*dim(train)[1])-1),]
+    trainino = train[-c(((k-1)*round(0.1*dim(train)[1])+1):(k*round(0.1*dim(train)[1])-1)),]
+    
+    mod = glm(osm_surf ~ rmean+rmin+rmax+
+                gmean+gvar+gmed+gmax+
+                bvar+bmed+bmin+bmax, 
+                data = trainino, family = binomial(link = logit))
+    
+    real.values = validation$osm_surf
+    
+    predicted.values = as.numeric(predict(mod,newdata=validation,type="response")>threshold[i])
+    
+    confusion.matrix = table(real.values,predicted.values)
+    confusion.matrix
+    TP = confusion.matrix[2,2]
+    TN = confusion.matrix[1,1]
+    FP = confusion.matrix[1,2]
+    FN = confusion.matrix[2,1]
+    Acc = c(Acc,(TP+TN)/(TP+TN+FP+FN))
+    Sens = c(Sens,TP/(TP+FN))
+    Spec = c(Spec,TN/(TN+FP))
+    rmse = c(rmse,sqrt(mean((real.values-predicted.values)^2)))
+    
+    remove(validation)
+    remove(trainino)
+  }
+  
+  accuracy = c(accuracy,mean(Acc))
+  sensitivity = c(sensitivity,mean(Sens))
+  specificity = c(specificity,mean(Spec))
+  RMSE = c(RMSE,mean(rmse))
+}
+
+accuracy
+sensitivity
+specificity
+
+test$osm_surf = ifelse(test$osm_surf == 'paved',1,0)
+test$osm_typo_footway = ifelse(test$osm_typo == 'footway',1,0)
+test$osm_typo_primary = ifelse(test$osm_typo == 'primary',1,0)
+test$osm_typo_residentia = ifelse(test$osm_typo == 'residentia',1,0)
+test$osm_typo_secondary = ifelse(test$osm_typo == 'secondary',1,0)
+test$osm_typo_tertiary = ifelse(test$osm_typo == 'tertiary',1,0)
+test$osm_typo_unk = ifelse(test$osm_typo == 'unk',1,0)
+
+predicted.values = predict(final_model,newdata=test,type="response")
+threshold = 0.35
+predicted.values = ifelse(predicted.values>threshold,1,0)
+head(predicted.values)
+
+real.values = test$osm_surf
+tab = table(real.values,predicted.values)
+tab
+
+Accuracy = (tab[1,1]+tab[2,2])/(tab[1,1]+tab[1,2]+tab[2,1]+tab[2,2])
+Accuracy
+
+Sensitivity = tab[2,2]/(tab[2,1]+tab[2,2]) 
+Sensitivity
+
+Specificity = tab[1,1]/(tab[1,2]+tab[1,1])
+Specificity
+
+data = lance[which(lance$osm_surf == 'unk'),]
+data$osm_surf = ifelse(data$osm_surf == 'paved',1,0)
+data$osm_typo_footway = ifelse(data$osm_typo == 'footway',1,0)
+data$osm_typo_primary = ifelse(data$osm_typo == 'primary',1,0)
+data$osm_typo_residentia = ifelse(data$osm_typo == 'residentia',1,0)
+data$osm_typo_secondary = ifelse(data$osm_typo == 'secondary',1,0)
+data$osm_typo_tertiary = ifelse(data$osm_typo == 'tertiary',1,0)
+data$osm_typo_unk = ifelse(data$osm_typo == 'unk',1,0)
+
+threshold = 0.35
+predicted.values = ifelse(predict(final_model,newdata=data,
+                                  type="response")>threshold,1,0)
+
+for (i in 1:dim(data)[1]) {
+  data$osm_surf[i]=predicted.values[i]
+}
+
+total = rbind(train,test,data)
+
+st_bbox(total)
+(st_bbox(total)[3]-st_bbox(total)[1])*(st_bbox(total)[4]-st_bbox(total)[2])
+sum(total$Length)*1e-03
+i_asp = which(total$osm_surf==1)
+i_unp = which(total$osm_surf==0)
+ttt = character(dim(total)[1])
+ttt[i_unp]="1. unpaved"; ttt[i_asp]="2. paved"
+
+windows()  
+ggplot() + 
+  geom_sf(data = total, aes(color=ttt,fill=ttt))+
+  scale_fill_manual(values=c("forestgreen", "gold"))+
+  scale_color_manual(values=c("forestgreen", "gold"))+
+  labs(fill= "Pavement surface")+
+  ggtitle("Road network of the Greater Maputo area") + 
+  coord_sf() +
+  theme(panel.grid.major = element_line(color = gray(0.9), linetype=3, size=0.2), 
+        panel.background = element_rect(fill="white"))+
+  guides(color=FALSE)
