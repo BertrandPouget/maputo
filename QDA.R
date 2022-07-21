@@ -33,7 +33,9 @@ load <- pc$loadings
 
 #Osserviamo graficamente la percentuale di varianza spiegata
 #dalle varie componenti
+windows()
 layout(matrix(c(2,3,1,3),2,byrow=T))
+par(bg = "cornsilk1")
 plot(pc, las=2, main='Principal components')
 barplot(sapply(ds,sd)^2, las=2, main='Original Variables', ylab='Variances', ylim=c(0,1))
 plot(cumsum(pc$sd^2)/sum(pc$sd^2), type='b', axes=F, xlab='number of components', 
