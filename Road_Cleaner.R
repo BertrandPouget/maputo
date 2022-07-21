@@ -27,7 +27,8 @@ dat.ec <- hclust(dat.e, method = "complete")
 cluster.ec <- cutree(dat.ec, k=4)
 dat_col=cbind.data.frame(dat_col,cluster.ec)
 
-par(mfrow=c(2,1))
+x11()
+par(mfrow=c(2,1), bg = "cornsilk1")
 plot(dat.ec, main = "Dendrogram", hang = -0.1, xlab = "", labels = F, cex = 0.6, sub = "")
 # with k cluster
 rect.hclust(dat.ec, k = 4)
