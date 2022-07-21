@@ -547,11 +547,7 @@ predicted.values = ifelse(predicted.values>threshold,1,0)
 head(predicted.values)
 
 real.values = test$osm_surf
-tab = table(class.true=real.values, class.assigned=predicted.values)
-tab
-rownames(tab) = c("unpaved", "paved")
-colnames(tab) = c("unpaved", "paved")
-tab <- tab[c(2,1),c(2,1)]
+tab = table(real.values,predicted.values)
 tab
 
 Accuracy = (tab[1,1]+tab[2,2])/(tab[1,1]+tab[1,2]+tab[2,1]+tab[2,2])
@@ -593,10 +589,10 @@ ttt[i_unp]="1. unpaved"; ttt[i_asp]="2. paved"
 windows()  
 ggplot() + 
   geom_sf(data = total, aes(color=ttt,fill=ttt))+
-  scale_fill_manual(values=c("forestgreen", "gold"))+
-  scale_color_manual(values=c("forestgreen", "gold"))+
+  scale_fill_manual(values=c("forestgreen", "brown"))+
+  scale_color_manual(values=c("forestgreen", "brown"))+
   labs(fill= "Pavement surface")+
-  coord_sf() +
+    coord_sf() +
   theme(panel.grid.major = element_line(color = gray(0.9), linetype=3, size=0.2), 
-        panel.background = element_rect(fill="white"))+
+        panel.background = element_rect(fill="cornsilk1"))+
   guides(color=FALSE)

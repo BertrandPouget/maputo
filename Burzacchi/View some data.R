@@ -46,13 +46,12 @@ ttt[i_unk]= "1. unknown"; ttt[i_unp]="2. unpaved"; ttt[i_asp]="3. paved"
 
 windows();  ggplot() + 
   geom_sf(data = data, aes(color=ttt,fill=ttt))+
-  scale_fill_manual(values=c("snow2", "forestgreen", "gold"))+
-  scale_color_manual(values=c("snow2", "forestgreen", "gold"))+
+  scale_fill_manual(values=c("darkgray", "forestgreen", "brown"))+
+  scale_color_manual(values=c("darkgray", "forestgreen", "brown"))+
   labs(fill= "Pavement surface")+
-  #ggtitle("Road network of the Greater Maputo area") + 
   coord_sf() +
   theme(panel.grid.major = element_line(color = gray(.9), linetype=3, size=0.2), 
-        panel.background = element_rect(fill="white"))+
+        panel.background = element_rect(fill="cornsilk1"))+
   guides(color=FALSE)
 
 
