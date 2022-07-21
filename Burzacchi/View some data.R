@@ -76,7 +76,7 @@ img_unpaved = brick("img__129.tif")
 
 
 # full pictures:
-par(mfrow=c(2,1)); plotRGB(img_paved); plotRGB(img_unpaved)
+par(mfrow=c(2,1),bg = "cornsilk1"); plotRGB(img_paved); plotRGB(img_unpaved)
 
 
 # layer by layer:
@@ -88,7 +88,7 @@ View(values(img_paved))
 
 # histogram of pixel components: red, green, blue
 {
-  par(mfrow=c(2,3))
+  par(mfrow=c(2,3), bg = "cornsilk1")
   hist(img_paved$redBand, xlab="", main='red values', col='red')
   hist(img_paved$greenBand, xlab="", main='green values', col='green')
   hist(img_paved$blueBand, xlab="", main='blue values', col='blue')
@@ -102,7 +102,8 @@ val_paved = data.frame(values(img_paved)[which(apply(values(img_paved),1,sum)!=0
 val_unpaved = data.frame(values(img_unpaved)[which(apply(values(img_unpaved),1,sum)!=0),])
 
 {
-  par(mfrow=c(2,3))
+  x11()
+  par(mfrow=c(2,3), bg = "cornsilk1")
   hist(val_paved$redBand, xlab="", main='red values', col='red')
   hist(val_paved$greenBand, xlab="", main='green values', col='green')
   hist(val_paved$blueBand, xlab="", main='blue values', col='blue')
