@@ -35,7 +35,7 @@ for(i in 1:5116)
   dist[i] = sqrt((cityhall[1]-mean_x[i])^2+(cityhall[2]-mean_y[i])^2)
 }
 rm(g,mat,i)
-
+dist=dist/1000
 #Sostituiamo la colonna della geometria con le medie calcolate
 #e togliamo i dati "sporchi"
 d = st_drop_geometry(d)
@@ -71,25 +71,30 @@ g.no <- gstat(formula = osm_surf ~ dist + osm_typo + rmean +
 
 # Prediction
 x = NULL
-for(i in 1:257)
-{
-  x1 = data.frame(
-  osm_typo = test[i,2],
-  mean_x = test[i,6],
-  mean_y = test[i,7],
-  dist = test[i,8],
-  rmean = test[i,4],
-  rvar = test[i,5])
-  coordinates(x1) <- c("mean_x","mean_y")
-  pr <- predict(g.no, x1, BLUE = TRUE)$var1.pred
-  print(i)
-  x = c(x, ifelse(pr > 0.5, 1, 0))
+threshold = c(0.2,0.35,0.5)
+for (j in 1:length(threshold)) {
+  for(i in 1:257)
+  {
+    x1 = data.frame(
+    osm_typo = test[i,2],
+    mean_x = test[i,6],
+    mean_y = test[i,7],
+    dist = test[i,8],
+    rmean = test[i,4],
+    rvar = test[i,5])
+    coordinates(x1) <- c("mean_x","mean_y")
+    pr <- predict(g.no, x1, BLUE = TRUE)$var1.pred
+   print(i)
+   x = c(x, ifelse(pr > threshold[j], 1, 0))
+  }
+  t <- table(class.true=test$osm_surf, class.assigned=x)
+  rownames(t) = c("unpaved", "paved")
+  colnames(t) = c("unpaved", "paved")
+  t <- t[c(2,1),c(2,1)]
+  t
+  accuracy <- (t[1,1]+t[2,2])/257
+  accuracy
 }
-t <- table(class.true=test$osm_surf, class.assigned=x)
-rownames(t) = c("unpaved", "paved")
-colnames(t) = c("unpaved", "paved")
-t <- t[c(2,1),c(2,1)]
-t
-accuracy <- (t[1,1]+t[2,2])/257
-accuracy
+
+
 
