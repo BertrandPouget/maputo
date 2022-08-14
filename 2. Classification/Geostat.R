@@ -19,7 +19,7 @@ setwd("C:/Users/giuli/OneDrive/Desktop/Maputo")
 set.seed(10094)
 d = st_read("lance.shp")
 
-#Creiamo e abitiamo i vettori delle medie
+# Creiamo e abitiamo i vettori delle medie
 mean_x = rep(0,5116)
 mean_y = rep(0,5116)
 dist = rep(0,5116)
@@ -36,8 +36,8 @@ for(i in 1:5116)
 }
 rm(g,mat,i)
 dist=dist/1000
-#Sostituiamo la colonna della geometria con le medie calcolate
-#e togliamo i dati "sporchi"
+# Sostituiamo la colonna della geometria con le medie calcolate
+# e togliamo i dati "sporchi"
 d = st_drop_geometry(d)
 d = cbind.data.frame(d,mean_x,mean_y,dist)
 d = d[-c(4287, 1218, 4368, 3337, 3325, 3990),c(2:4,7:8,22:24)]
@@ -54,7 +54,7 @@ pav = ifelse(test$osm_surf == 'paved', 1, 0)
 test$osm_surf = pav
 rm(pav)
 
-## Define the sample coordinates
+# Define the sample coordinates
 coordinates(train) <- c('mean_x','mean_y')
 
 # Variogram

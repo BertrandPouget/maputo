@@ -1,5 +1,5 @@
 # DIRECTORY MAPUTO
-# setwd("C:/Users/markh/Desktop/Universit√†/Maputo")
+# setwd("C:/Users/markh/Desktop/Universit‡/Maputo")
 rm(list=ls())
 graphics.off()
 
@@ -18,7 +18,7 @@ rmean=rvar=rmed=rmin=rmax=gmean=gvar=gmed=gmin=gmax=bmean=bvar=bmed=bmin=bmax=re
 lance=cbind(datini,rmean,rvar,rmed,rmin,rmax,gmean,gvar,gmed,gmin,gmax,bmean,bvar,bmed,bmin,bmax)
 
 # DIRECTORY RATER_MASK_DATONITE
-# setwd("C:/Users/markh/Desktop/Universit√†/Maputo/rater_mask_datonite")
+# setwd("C:/Users/markh/Desktop/Universit‡/Maputo/rater_mask_datonite")
 
 # Abitiamo le colonne e creiamo il nuvo dataset
 for(i in 1:dim(datini)[1])

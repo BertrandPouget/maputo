@@ -1,4 +1,4 @@
-#Ricorda di settare la tua working directory da Session!
+# Ricorda di settare la tua working directory da Session!
 rm(list=ls())
 graphics.off()
 
@@ -27,8 +27,8 @@ pc <- princomp(ds, scores = TRUE)
 summary(pc)
 load <- pc$loadings
 
-#Osserviamo graficamente la percentuale di varianza spiegata
-#dalle varie componenti
+# Osserviamo graficamente la percentuale di varianza spiegata
+# dalle varie componenti
 layout(matrix(c(2,3,1,3),2,byrow=T))
 plot(pc, las=2, main='Principal components')
 barplot(sapply(ds,sd)^2, las=2, main='Original Variables', ylab='Variances', ylim=c(0,1))
@@ -44,8 +44,8 @@ axis(1,at=1:ncol(ds),labels=1:ncol(ds),las=2)
 # cumulative proportion of explained variance
 cumsum(pc$sd^2)/sum(pc$sd^2)
 
-#Rappresentiamo i loadings delle componenti principali, per 
-#poterli interpretare
+# Rappresentiamo i loadings delle componenti principali, per 
+# poterli interpretare
 #x11()
 par(mfrow = c(5,1))
 for(i in 1:5) barplot(load[,i], ylim = c(-1, 1))
